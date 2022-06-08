@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ets.sprinsecurity.payload.request.SignupRequest;
+import com.ets.sprinsecurity.repo.RoleRepository;
+import com.ets.sprinsecurity.repo.UserRepository;
 import com.ets.sprinsecurity.response.MessageResponse;
-import com.ets.sprinsecurity.service.repo.RoleRepository;
-import com.ets.sprinsecurity.service.repo.UserRepository;
 
 @CrossOrigin("*")
 @RestController

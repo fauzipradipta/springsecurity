@@ -1,4 +1,4 @@
-package com.ets.sprinsecurity.service.repo;
+package com.ets.sprinsecurity.repo;
 
 import java.util.Optional;
 
