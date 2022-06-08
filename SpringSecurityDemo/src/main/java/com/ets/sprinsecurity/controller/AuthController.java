@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,19 +33,20 @@ public class AuthController {
 	
 	
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid SignupRequest signupRequest){
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
 		
 		//username should not be existing one
 		if(userRepository.existsByUsername(signupRequest.getUsername())){
 			return ResponseEntity.badRequest().body(new MessageResponse("error : username is already taken"));
 		}
 		
+		//email exists
 		if(userRepository.existsByEmail(signupRequest.getEmail())) {
 			return ResponseEntity.badRequest().body(new MessageResponse("error: email is already taken"));
 		}
 		
 		//create the user
-		// tp register new user ====> we need details in user entity
+		// to register new user ====> we need details in user entity
 		//user entity based on user entity
 		
 		User user = new User(signupRequest.getUsername(),signupRequest.getEmail(),signupRequest.getPassword());
