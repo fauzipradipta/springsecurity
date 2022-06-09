@@ -1,6 +1,7 @@
 package com.ets.sprinsecurity.controller;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ets.sprinsecurity.dto.Role;
 import com.ets.sprinsecurity.dto.User;
 import com.ets.sprinsecurity.enums.ERole;
-import com.ets.sprinsecurity.dto.Role;
+import com.ets.sprinsecurity.payload.request.JwtResponse;
+import com.ets.sprinsecurity.payload.request.LoginRequest;
 import com.ets.sprinsecurity.payload.request.SignupRequest;
 import com.ets.sprinsecurity.repo.RoleRepository;
 import com.ets.sprinsecurity.repo.UserRepository;
@@ -31,7 +34,12 @@ public class AuthController {
 	@Autowired
 	RoleRepository roleRepository;
 	
-	
+	@PostMapping("/signin")
+	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
+		//custom Response
+		//spring security
+		return ResponseEntity.ok(new JwtResponse(null,null,null,null,null));
+	}
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
 		
