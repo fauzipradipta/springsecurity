@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 import com.ets.sprinsecurity.dto.Role;
 import com.ets.sprinsecurity.dto.User;
@@ -22,6 +25,7 @@ import com.ets.sprinsecurity.payload.request.SignupRequest;
 import com.ets.sprinsecurity.repo.RoleRepository;
 import com.ets.sprinsecurity.repo.UserRepository;
 import com.ets.sprinsecurity.response.MessageResponse;
+
 
 @CrossOrigin("*")
 @RestController
@@ -34,10 +38,19 @@ public class AuthController {
 	@Autowired
 	RoleRepository roleRepository;
 	
+	@Autowired
+	AuthenticationManager authenticationManager;
+	
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
 		//custom Response
 		//spring security
+		//ResponseEntity.status(200).body(object)
+
+		//validating the credentials
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		//jwtUtils will help us to get the token
+
 		return ResponseEntity.ok(new JwtResponse(null,null,null,null,null));
 	}
 	@PostMapping("/signup")
