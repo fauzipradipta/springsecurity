@@ -25,7 +25,7 @@ public class JwtUtils {
 	@Value("SpringSecurityDemo.app.jwtSecret")
 	private String jwtSecret; 
 	//2. expiry duration: which we will use it to invalidate the token.
-	@Value("SpringSecurityDemo.app.jwtExpirationMs")
+	@Value("${SpringSecurityDemo.app.jwtExpirationMs}")
 	private int jwtExpirationMS;
 	
 	
