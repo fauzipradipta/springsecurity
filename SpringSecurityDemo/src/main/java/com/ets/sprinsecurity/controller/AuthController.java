@@ -1,7 +1,9 @@
 package com.ets.sprinsecurity.controller;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -15,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ets.sprinsecurity.dto.Role;
 import com.ets.sprinsecurity.dto.User;
@@ -25,6 +30,8 @@ import com.ets.sprinsecurity.payload.request.SignupRequest;
 import com.ets.sprinsecurity.repo.RoleRepository;
 import com.ets.sprinsecurity.repo.UserRepository;
 import com.ets.sprinsecurity.response.MessageResponse;
+import com.ets.sprinsecurity.security.jwt.JwtUtils;
+import com.ets.sprinsecurity.security.service.UserDetailsImpl;
 
 
 @CrossOrigin("*")
@@ -41,6 +48,12 @@ public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 	
+	@Autowired
+	JwtUtils jwtUtils;
+	
+	@Autowired
+	PasswordEncoder encoder;
+	
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
 		//custom Response
@@ -48,10 +61,21 @@ public class AuthController {
 		//ResponseEntity.status(200).body(object)
 
 		//validating the credentials
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken
+				(loginRequest.getUsername(), loginRequest.getPassword()));
+		
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
+		String jwt = jwtUtils.generateJwtToken(authentication);
+		UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
+		
+		List<String> roles = userDetailsImpl.getAuthorities().stream().map(item->item.getAuthority()).collect(Collectors.toList());
+		
 		//jwtUtils will help us to get the token
-
-		return ResponseEntity.ok(new JwtResponse(null,null,null,null,null));
+		return ResponseEntity.ok(new JwtResponse(jwt,userDetailsImpl.getId()
+				,userDetailsImpl.getUsername()
+				,userDetailsImpl.getEmail(),roles));
 	}
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
@@ -70,7 +94,8 @@ public class AuthController {
 		// to register new user ====> we need details in user entity
 		//user entity based on user entity
 		
-		User user = new User(signupRequest.getUsername(),signupRequest.getEmail(),signupRequest.getPassword());
+		User user = new User(signupRequest.getUsername(),signupRequest.getEmail(),
+				encoder.encode(signupRequest.getPassword()));
 		Set<String> strRoles = signupRequest.getRole();
 		Set<Role> roles = new HashSet<>();
 		
